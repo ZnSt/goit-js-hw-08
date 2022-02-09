@@ -23,6 +23,7 @@ function onTextareaInput(event) {
 
 function onFormSubmit(event) {
   event.preventDefault();
+
   const resultData = localStorage.getItem("feedback-form-state");
 
   console.log(JSON.parse(resultData));
