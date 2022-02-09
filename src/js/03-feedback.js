@@ -1,26 +1,26 @@
+import throttle from "lodash.throttle";
+const STORAGE_KEY = "feedback-form-state";
+const feedbackData = { message: "", email: "" };
 const refs = {
-  input: document.querySelector(".feedback-form"),
-  textarea: document.querySelector(".feedback-form textarea"),
+  form: document.querySelector(".feedback-form"),
 };
-
-refs.input.addEventListener("submit", handleInput);
-refs.textarea.addEventListener("input", handleTextarea);
-
-onTextareapopulate();
-
-function handleInput(event) {
+refs.form.addEventListener("submit", handleSubmit);
+refs.form.addEventListener("input", throttle(updateDataInLocalStorage, 200));
+function updateDataInLocalStorage(event) {
+  feedbackData[event.target.name] = event.target.value;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(feedbackData));
+}
+function handleSubmit(event) {
   event.preventDefault();
-
   event.currentTarget.reset();
+  localStorage.removeItem(STORAGE_KEY);
+  console.log(feedbackData);
 }
-
-function handleTextarea(event) {
-  const message = event.currentTarget.value;
-  localStorage.setItem("feedback-form-state", message);
+function start() {
+  let data = localStorage.getItem(STORAGE_KEY);
+  if (!data) return;
+  data = JSON.parse(data);
+  const keys = Object.keys(data);
+  keys.forEach((key) => (refs.form.elements[key].value = data[key]));
 }
-
-function onTextareapopulate() {
-  const savedMessage = localStorage.getItem("feedback-form-state");
-}
-// 1 считать данные с localStorage
-// 2 сделать проверку(если данных нет в localStorage то мы выходим из функции иначе мы парсим эти данные и добавляем значения нашим полям формы)
+start();
